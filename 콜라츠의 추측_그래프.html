@@ -1,0 +1,231 @@
+<!--
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Collatz Conjecture</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="collatzChart" width="800" height="400"></canvas>
+
+    <script>
+        function generateChart(n) {
+            let sequence = [n];
+            let repetition_count = 0;
+            let highest_number = n;
+
+            while (n !== 1) {
+                if (n % 2 === 0) {
+                    n = n / 2;
+                } else {
+                    n = 3 * n + 1;
+                }
+                repetition_count++;
+                sequence.push(n);
+
+                if (highest_number < n) {
+                    highest_number = n;
+                }
+            }
+
+            // 그래프 생성
+            let labels = Array.from({length: repetition_count + 1}, (_, i) => i);
+            labels.push(repetition_count);
+
+            let ctx = document.getElementById('collatzChart').getContext('2d');
+            if (window.chart) {
+                window.chart.destroy(); // 이전에 생성된 그래프 제거
+            }
+            window.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Collatz Conjecture',
+                        data: sequence,
+                        fill: false,
+                        borderColor: 'blue',
+                        backgroundColor: 'transparent',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Steps'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Number'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Collatz Conjecture'
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            generateChart(10); // 초기 그래프 생성
+
+            // 그래프 클릭 시 숫자 입력 받기
+            document.getElementById('collatzChart').addEventListener('click', function() {
+                let input = prompt("숫자 대입:");
+                if (input) {
+                    let n = parseInt(input);
+                    if (!isNaN(n)) {
+                        generateChart(n);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Collatz Conjecture</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="collatzChart" width="800" height="400"></canvas>
+
+    <script>
+        function generateChart(n) {
+            let sequence = [n];
+            let repetition_count = 0;
+            let highest_number = n;
+
+            while (n !== 1) {
+                if (n % 2 === 0) {
+                    n = n / 2;
+                } else {
+                    n = 3 * n + 1;
+                }
+                repetition_count++;
+                sequence.push(n);
+
+                if (highest_number < n) {
+                    highest_number = n;
+                }
+            }
+
+            // 그래프 생성
+            let labels = Array.from({length: repetition_count + 1}, (_, i) => i);
+            labels.push(repetition_count);
+
+            let ctx = document.getElementById('collatzChart').getContext('2d');
+            if (window.chart) {
+                window.chart.destroy(); // 이전에 생성된 그래프 제거
+            }
+            window.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Collatz Conjecture',
+                        data: sequence,
+                        fill: false,
+                        borderColor: 'blue',
+                        backgroundColor: 'transparent',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Steps'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Number'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Collatz Conjecture'
+                        }
+                    }
+                }
+            });
+
+            // 선형 회귀 계산
+            const x = labels;
+            const y = sequence;
+            const nPoints = labels.length;
+            const sumX = x.reduce((acc, val) => acc + val, 0);
+            const sumY = y.reduce((acc, val) => acc + val, 0);
+            const sumXY = x.map((val, index) => val * y[index]).reduce((acc, val) => acc + val, 0);
+            const sumXX = x.map(val => val * val).reduce((acc, val) => acc + val, 0);
+            const slope = (nPoints * sumXY - sumX * sumY) / (nPoints * sumXX - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / nPoints;
+
+            // 선형 회귀선 데이터 생성
+            const regressionLine = x.map(val => slope * val + intercept);
+
+            // 선형 회귀선을 그래프에 추가
+            window.chart.data.datasets.push({
+                label: 'Linear Regression',
+                data: regressionLine,
+                fill: false,
+                borderColor: 'red',
+                backgroundColor: 'transparent',
+            });
+
+            window.chart.update();
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            generateChart(10); // 초기 그래프 생성
+
+            // 그래프 클릭 시 숫자 입력 받기
+            document.getElementById('collatzChart').addEventListener('click', function() {
+                let input = prompt("숫자 대입:");
+                if (input) {
+                    let n = parseInt(input);
+                    if (!isNaN(n)) {
+                        generateChart(n);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
